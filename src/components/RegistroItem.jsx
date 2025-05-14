@@ -36,7 +36,7 @@ export default function RegistroItem({ id, onDelete }) {
   const formatoHora = (iso) => iso ? new Date(iso).toLocaleTimeString() : "--";
 
   const botonClase = (seleccionado, valor) =>
-    \`px-2 py-1 rounded-full text-sm font-semibold \${seleccionado === valor ? 'bg-blue-600 text-white' : 'bg-gray-300 text-black'}\`;
+    `px-2 py-1 rounded-full text-sm font-semibold ${seleccionado === valor ? 'bg-blue-600 text-white' : 'bg-gray-300 text-black'}`;
 
   return (
     <div className="grid grid-cols-9 gap-2 items-center border border-white text-black bg-white p-4 rounded-lg shadow mb-6 relative">
