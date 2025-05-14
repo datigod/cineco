@@ -97,8 +97,14 @@ export default function RegistroProducto() {
                   <button
                     key={p}
                     onClick={() => seleccionarProducto(i, p)}
-                    className={"px-3 py-1 rounded-full text-sm font-semibold " +
-                      (lote.producto === p ? "bg-blue-600 text-white" : "bg-gray-200 text-black")}
+                    className={
+                      "px-3 py-1 rounded-full text-sm font-semibold " +
+                      (lote.fin && lote.cantidad > 0 && lote.producto === p
+                        ? "bg-green-600 text-white"
+                        : lote.producto === p
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-200 text-black")
+                    }
                   >
                     {p}
                   </button>
