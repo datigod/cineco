@@ -57,7 +57,7 @@ export default function RegistroItem({ id, onDelete }) {
           <div className="font-bold mb-1">Arribo</div>
           <button
             onClick={() => setArribo(now())}
-            className="w-full bg-gray-700 py-1 rounded"
+            className={"w-full py-1 rounded " + (arribo ? "bg-green-600 text-white" : "bg-gray-700 text-white")}
           >
             {format(arribo)}
           </button>
@@ -66,7 +66,7 @@ export default function RegistroItem({ id, onDelete }) {
           <div className="font-bold mb-1">Inicio Caja</div>
           <button
             onClick={() => setInicioCaja(now())}
-            className="w-full bg-gray-700 py-1 rounded"
+            className={"w-full py-1 rounded " + (inicioCaja ? "bg-green-600 text-white" : "bg-gray-700 text-white")}
           >
             {format(inicioCaja)}
           </button>
@@ -75,7 +75,7 @@ export default function RegistroItem({ id, onDelete }) {
           <div className="font-bold mb-1">Fin Caja</div>
           <button
             onClick={() => setFinCaja(now())}
-            className="w-full bg-gray-700 py-1 rounded"
+            className={"w-full py-1 rounded " + (finCaja ? "bg-green-600 text-white" : "bg-gray-700 text-white")}
           >
             {format(finCaja)}
           </button>
