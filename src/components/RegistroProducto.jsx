@@ -17,6 +17,14 @@ export default function RegistroProducto() {
     setLotes(prev => [...prev, nuevo]);
   };
 
+  const seleccionarProducto = (i, producto) => {
+    setLotes(prev => {
+      const copia = [...prev];
+      copia[i].producto = producto;
+      return copia;
+    });
+  };
+
   const finalizarLote = (i) => {
     const fin = new Date().toISOString();
     setLotes(prev => {
@@ -24,10 +32,6 @@ export default function RegistroProducto() {
       copia[i].fin = fin;
       return copia;
     });
-  };
-
-  const eliminarLote = (i) => {
-    setLotes(prev => prev.filter((_, index) => index !== i));
   };
 
   const actualizarCantidad = (i, cantidad) => {
@@ -38,12 +42,8 @@ export default function RegistroProducto() {
     });
   };
 
-  const seleccionarProducto = (i, producto) => {
-    setLotes(prev => {
-      const copia = [...prev];
-      copia[i].producto = producto;
-      return copia;
-    });
+  const eliminarLote = (i) => {
+    setLotes(prev => prev.filter((_, index) => index !== i));
   };
 
   const validar = () => {
@@ -89,24 +89,23 @@ export default function RegistroProducto() {
       {lotes.length > 0 && (
         <div className="flex flex-col gap-4 mb-6">
           {lotes.map((lote, i) => (
-            <div key={i} className="bg-white text-black p-4 rounded shadow flex flex-col items-center gap-2">
+            <div key={i} className="bg-white text-black p-4 rounded shadow flex flex-col items-center gap-3">
               <div className="font-bold text-center">Inicio: {formato(lote.inicio)}</div>
 
-              <div className="flex flex-wrap justify-center gap-3 items-center w-full">
-                <div className="flex flex-col items-center">
-                  <label className="text-sm font-medium text-center">Producto</label>
-                  <select
-                    value={lote.producto}
-                    onChange={(e) => seleccionarProducto(i, e.target.value)}
-                    className="px-2 py-1 border rounded text-sm"
+              <div className="flex flex-wrap justify-center gap-2">
+                {productos.map(p => (
+                  <button
+                    key={p}
+                    onClick={() => seleccionarProducto(i, p)}
+                    className={"px-3 py-1 rounded-full text-sm font-semibold " +
+                      (lote.producto === p ? "bg-blue-600 text-white" : "bg-gray-200 text-black")}
                   >
-                    <option value="">Seleccionar</option>
-                    {productos.map(p => (
-                      <option key={p} value={p}>{p}</option>
-                    ))}
-                  </select>
-                </div>
+                    {p}
+                  </button>
+                ))}
+              </div>
 
+              <div className="flex flex-wrap justify-center gap-3 items-center w-full">
                 <div className="flex flex-col items-center">
                   <label className="text-sm font-medium text-center">Cantidad</label>
                   <input
@@ -130,14 +129,12 @@ export default function RegistroProducto() {
                   </button>
                 </div>
 
-                <div>
-                  <button
-                    onClick={() => eliminarLote(i)}
-                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
-                  >
-                    Eliminar
-                  </button>
-                </div>
+                <button
+                  onClick={() => eliminarLote(i)}
+                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+                >
+                  Eliminar
+                </button>
               </div>
             </div>
           ))}
