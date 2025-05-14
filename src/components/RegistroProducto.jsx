@@ -61,7 +61,7 @@ export default function RegistroProducto() {
           <button
             key={p}
             onClick={() => setActivo(p)}
-            className={\`px-4 py-2 rounded-full font-semibold \${activo === p ? 'bg-blue-600 text-white' : 'bg-gray-300 text-black'}\`}
+            className={"px-4 py-2 rounded-full font-semibold " + (activo === p ? "bg-blue-600 text-white" : "bg-gray-300 text-black")}
           >
             {p}
           </button>
