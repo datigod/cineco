@@ -28,26 +28,30 @@ export default function RegistroItem({ id, onDelete }) {
   };
 
   const enviar = async () => {
-    await addDoc(collection(db, "registros"), {
-      descripcion,
-      arribo: tiempos.arribo,
-      inicioCaja: tiempos.inicioCaja,
-      finCaja: tiempos.finCaja,
-      finPedido: tiempos.finPedido,
-      metodoPago,
-      productos
-    });
-    setEnviado(true);
-    setTimeout(() => {
-      setEnviado(false);
-      onDelete();
-    }, 2000);
+    try {
+      await addDoc(collection(db, "registros"), {
+        descripcion,
+        metodoPago,
+        productos,
+        ...tiempos,
+        timestamp: new Date().toISOString()
+      });
+      setEnviado(true);
+      setTimeout(() => {
+        setEnviado(false);
+        onDelete(); // eliminar el registro visualmente
+      }, 2000);
+    } catch (error) {
+      alert("Error al guardar el registro: " + error.message);
+    }
   };
 
   const formatoHora = (iso) => iso ? new Date(iso).toLocaleTimeString() : "--";
 
-  const botonClase = (seleccionado, valor) =>
-    `px-2 py-1 rounded-full text-sm font-semibold ${seleccionado === valor ? 'bg-blue-600 text-white' : 'bg-gray-300 text-black'}`;
+  const botonClase = (seleccionado, valor) => {
+    return "px-2 py-1 rounded-full text-sm font-semibold " +
+      (seleccionado === valor ? "bg-blue-600 text-white" : "bg-gray-300 text-black");
+  };
 
   return (
     <div className="flex flex-col gap-4 border border-white text-black bg-white p-6 rounded-lg shadow mb-6 max-w-6xl mx-auto relative">
