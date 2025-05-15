@@ -22,7 +22,7 @@ export default function App() {
     <div className="bg-black min-h-screen text-white p-6">
       <h1 className="text-3xl font-bold text-center mb-6">Panel de Registro</h1>
 
-      <div className="flex justify-center gap-4 mb-8">
+      <div className="flex justify-center gap-4 mb-8 flex-wrap">
         {tabs.map(tab => (
           <button
             key={tab.id}
@@ -37,9 +37,10 @@ export default function App() {
         ))}
       </div>
 
-      {vista === 'arribo' && (
-        <>
-          <h2 className="text-2xl font-bold text-center mb-4">Registro de Arribo</h2>
+      <div className="relative">
+        {/* REGISTRO DE CAJA */}
+        <div className={vista === 'arribo' ? "block" : "hidden"}>
+          <h2 className="text-2xl font-bold text-center mb-4">Registro de Caja</h2>
           {registros.map((id) => (
             <RegistroItem key={id} id={id} onDelete={() => eliminarRegistro(id)} />
           ))}
@@ -51,12 +52,23 @@ export default function App() {
               Agregar Registro
             </button>
           </div>
-        </>
-      )}
+        </div>
 
-      {vista === 'cantidad' && <RegistroCantidad />}
-      {vista === 'producto' && <RegistroProducto />}
-      {vista === 'arribos' && <RegistroArribos />}
+        {/* REGISTRO DE CANTIDAD */}
+        <div className={vista === 'cantidad' ? "block" : "hidden"}>
+          <RegistroCantidad />
+        </div>
+
+        {/* REGISTRO DE PRODUCTO */}
+        <div className={vista === 'producto' ? "block" : "hidden"}>
+          <RegistroProducto />
+        </div>
+
+        {/* REGISTRO DE ARRIBOS */}
+        <div className={vista === 'arribos' ? "block" : "hidden"}>
+          <RegistroArribos />
+        </div>
+      </div>
     </div>
   );
 }
