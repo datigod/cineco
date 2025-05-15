@@ -12,7 +12,7 @@ export default function App() {
   const eliminarRegistro = (id) => setRegistros(prev => prev.filter(item => item !== id));
 
   const tabs = [
-    { id: 'arribo', label: 'Registro de Arribo' },
+    { id: 'arribo', label: 'Registro de Caja' },
     { id: 'cantidad', label: 'Registro de Cantidad' },
     { id: 'producto', label: 'Registro de Producto' },
     { id: 'arribos', label: 'Registro de Arribos' }
