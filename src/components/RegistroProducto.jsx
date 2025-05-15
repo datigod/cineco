@@ -3,166 +3,146 @@ import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 
 export default function RegistroProducto() {
-  const productos = ["Crispetas", "Combo Perro", "Combo Nachos"];
   const [lotes, setLotes] = useState([]);
-  const [enviado, setEnviado] = useState(false);
+  const [activo, setActivo] = useState(null);
 
-  const iniciarLote = () => {
-    const nuevo = {
-      producto: "",
+  const iniciarProduccion = () => {
+    setLotes(prev => [...prev, {
+      producto: '',
+      cantidad: 0,
       inicio: new Date().toISOString(),
       fin: null,
-      cantidad: 0
-    };
-    setLotes(prev => [...prev, nuevo]);
+      enviado: false
+    }]);
   };
 
-  const seleccionarProducto = (i, producto) => {
+  const finalizarLote = (index) => {
     setLotes(prev => {
       const copia = [...prev];
-      copia[i].producto = producto;
+      copia[index].fin = new Date().toISOString();
       return copia;
     });
   };
 
-  const finalizarLote = (i) => {
-    const fin = new Date().toISOString();
+  const actualizarProducto = (index, producto) => {
     setLotes(prev => {
       const copia = [...prev];
-      copia[i].fin = fin;
+      copia[index].producto = producto;
       return copia;
     });
   };
 
-  const actualizarCantidad = (i, cantidad) => {
+  const cambiarCantidad = (index, delta) => {
     setLotes(prev => {
       const copia = [...prev];
-      copia[i].cantidad = parseInt(cantidad) || 0;
+      const nueva = copia[index].cantidad + delta;
+      if (nueva >= 0) copia[index].cantidad = nueva;
       return copia;
     });
   };
 
-  const eliminarLote = (i) => {
-    setLotes(prev => prev.filter((_, index) => index !== i));
-  };
-
-  const validar = () => {
-    return (
-      lotes.length > 0 &&
-      lotes.every(l => l.producto !== "" && l.fin && l.cantidad > 0)
-    );
-  };
-
-  const enviar = async () => {
-    if (!validar()) {
-      alert("Cada lote debe tener producto seleccionado, tiempo finalizado y cantidad mayor a cero.");
+  const enviarLote = async (index) => {
+    const lote = lotes[index];
+    if (!lote.producto || !lote.fin || lote.cantidad === 0) {
+      alert("Completa el producto, la cantidad y finaliza el lote antes de enviarlo.");
       return;
     }
+
     try {
-      await addDoc(collection(db, "registro_producto"), {
-        lotes,
-        timestamp: new Date().toISOString()
+      await addDoc(collection(db, "registro_producto"), lote);
+      setLotes(prev => {
+        const copia = [...prev];
+        copia[index].enviado = true;
+        return copia;
       });
-      setEnviado(true);
-      setTimeout(() => setEnviado(false), 2000);
-      setLotes([]);
-    } catch (error) {
-      alert("Error al guardar: " + error.message);
+    } catch (e) {
+      alert("Error al enviar: " + e.message);
     }
   };
 
-  const formato = (iso) => iso ? new Date(iso).toLocaleTimeString() : "--";
+  const eliminarLote = (index) => {
+    const confirmar = window.confirm("¿Eliminar este registro?");
+    if (confirmar) {
+      setLotes(prev => prev.filter((_, i) => i !== index));
+    }
+  };
+
+  const format = (t) => t ? new Date(t).toLocaleTimeString() : "--";
+  const productos = ["Crispetas", "Combo Perro", "Combo Nachos"];
 
   return (
     <div className="text-white max-w-4xl mx-auto">
-      <h2 className="text-2xl font-bold text-center mb-4">Registro por Producto</h2>
+      <h2 className="text-2xl font-bold text-center mb-6">Registro por Producto</h2>
 
       <div className="flex justify-center mb-6">
         <button
-          onClick={iniciarLote}
-          className="bg-gray-800 text-white px-6 py-2 rounded shadow"
+          onClick={iniciarProduccion}
+          className="bg-gray-900 hover:bg-gray-700 text-white px-6 py-3 rounded text-lg shadow"
         >
           Iniciar Producción
         </button>
       </div>
 
-      {lotes.length > 0 && (
-        <div className="flex flex-col gap-4 mb-6">
-          {lotes.map((lote, i) => (
-            <div key={i} className="bg-white text-black p-4 rounded shadow flex flex-col items-center gap-3">
-              <div className="font-bold text-center">Inicio: {formato(lote.inicio)}</div>
+      {lotes.map((lote, i) => (
+        <div key={i} className="bg-white text-black p-6 rounded shadow mb-6 text-center">
+          <div className="font-bold mb-2">Inicio: {format(lote.inicio)}</div>
 
-              <div className="flex flex-wrap justify-center gap-2">
-                {productos.map(p => (
-                  <button
-                    key={p}
-                    onClick={() => seleccionarProducto(i, p)}
-                    className={
-                      "px-3 py-1 rounded-full text-sm font-semibold " +
-                      (lote.fin && lote.cantidad > 0 && lote.producto === p
-                        ? "bg-green-600 text-white"
-                        : lote.producto === p
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-200 text-black")
-                    }
-                  >
-                    {p}
-                  </button>
-                ))}
-              </div>
+          <div className="flex justify-center gap-2 flex-wrap mb-3">
+            {productos.map(p => (
+              <button
+                key={p}
+                onClick={() => actualizarProducto(i, p)}
+                className={
+                  "px-4 py-1 rounded-full font-semibold " +
+                  (lote.producto === p ? "bg-blue-600 text-white" : "bg-gray-300 text-black")
+                }
+              >
+                {p}
+              </button>
+            ))}
+          </div>
 
-              <div className="flex flex-wrap justify-center gap-3 items-center w-full">
-                <div className="flex flex-col items-center">
-                  <label className="text-sm font-medium text-center">Cantidad</label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={lote.cantidad}
-                    onChange={(e) => actualizarCantidad(i, e.target.value)}
-                    className="w-20 px-2 py-1 border rounded text-center"
-                  />
-                </div>
+          <div className="flex justify-center items-center gap-4 mb-4">
+            <button onClick={() => cambiarCantidad(i, -1)} className="bg-gray-300 px-3 py-1 rounded">−</button>
+            <div className="text-lg font-bold">{lote.cantidad}</div>
+            <button onClick={() => cambiarCantidad(i, 1)} className="bg-gray-300 px-3 py-1 rounded">+</button>
+          </div>
 
-                <div className="flex flex-col items-center">
-                  <label className="text-sm font-medium text-center">Fin</label>
-                  <div className="text-xs bg-gray-100 rounded px-3 py-1">{formato(lote.fin)}</div>
-                  <button
-                    onClick={() => finalizarLote(i)}
-                    className="bg-gray-700 text-white px-4 py-1 mt-1 rounded"
-                    disabled={!!lote.fin}
-                  >
-                    Finalizar
-                  </button>
-                </div>
-
-                <button
-                  onClick={() => eliminarLote(i)}
-                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
-                >
-                  Eliminar
-                </button>
-              </div>
+          <div className="flex justify-center gap-2 mb-4">
+            <div className="flex flex-col items-center">
+              <label className="text-sm font-medium text-center">Fin</label>
+              <button
+                onClick={() => finalizarLote(i)}
+                className="bg-gray-800 text-white px-4 py-2 rounded w-24"
+                disabled={!!lote.fin}
+              >
+                {format(lote.fin)}
+              </button>
             </div>
-          ))}
-        </div>
-      )}
+          </div>
 
-      {lotes.length > 0 && (
-        <div className="flex justify-center">
-          <button
-            onClick={enviar}
-            className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded shadow"
-          >
-            Enviar Registros
-          </button>
-        </div>
-      )}
+          <div className="flex justify-center gap-4">
+            {!lote.enviado && (
+              <button
+                onClick={() => enviarLote(i)}
+                className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded shadow"
+              >
+                Enviar
+              </button>
+            )}
+            <button
+              onClick={() => eliminarLote(i)}
+              className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded shadow"
+            >
+              Eliminar
+            </button>
+          </div>
 
-      {enviado && (
-        <div className="text-center mt-4 text-green-400 font-medium">
-          Registros enviados correctamente ✔️
+          {lote.enviado && (
+            <div className="mt-3 text-green-500 font-medium">✔️ Enviado</div>
+          )}
         </div>
-      )}
+      ))}
     </div>
   );
 }
