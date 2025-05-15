@@ -4,7 +4,6 @@ import { db } from '../firebase';
 
 export default function RegistroItem({ id, onDelete }) {
   const [descripcion, setDescripcion] = useState('');
-  const [arribo, setArribo] = useState(null);
   const [inicioCaja, setInicioCaja] = useState(null);
   const [finCaja, setFinCaja] = useState(null);
   const [metodoPago, setMetodoPago] = useState('');
@@ -12,7 +11,7 @@ export default function RegistroItem({ id, onDelete }) {
 
   const now = () => new Date().toISOString();
 
-  const validar = () => arribo && inicioCaja && finCaja && metodoPago;
+  const validar = () => inicioCaja && finCaja && metodoPago;
 
   const enviarRegistro = async () => {
     if (!validar()) {
@@ -23,7 +22,6 @@ export default function RegistroItem({ id, onDelete }) {
     try {
       await addDoc(collection(db, 'registro_arribo'), {
         descripcion,
-        arribo,
         inicioCaja,
         finCaja,
         metodoPago,
@@ -52,21 +50,12 @@ export default function RegistroItem({ id, onDelete }) {
         className="w-full p-2 border rounded mb-4"
       />
 
-      <div className="grid grid-cols-3 gap-4 mb-4">
-        <div className="bg-gray-900 text-white text-center rounded p-3">
-          <div className="font-bold mb-1">Arribo</div>
-          <button
-            onClick={() => setArribo(now())}
-            className={"w-full py-1 rounded " + (arribo ? "bg-green-600 text-white" : "bg-gray-700 text-white")}
-          >
-            {format(arribo)}
-          </button>
-        </div>
+      <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="bg-gray-900 text-white text-center rounded p-3">
           <div className="font-bold mb-1">Inicio Caja</div>
           <button
             onClick={() => setInicioCaja(now())}
-            className={"w-full py-1 rounded " + (inicioCaja ? "bg-green-600 text-white" : "bg-gray-700 text-white")}
+            className={"w-full py-3 text-lg font-semibold rounded " + (inicioCaja ? "bg-green-600 text-white" : "bg-gray-700 text-white")}
           >
             {format(inicioCaja)}
           </button>
@@ -75,7 +64,7 @@ export default function RegistroItem({ id, onDelete }) {
           <div className="font-bold mb-1">Fin Caja</div>
           <button
             onClick={() => setFinCaja(now())}
-            className={"w-full py-1 rounded " + (finCaja ? "bg-green-600 text-white" : "bg-gray-700 text-white")}
+            className={"w-full py-3 text-lg font-semibold rounded " + (finCaja ? "bg-green-600 text-white" : "bg-gray-700 text-white")}
           >
             {format(finCaja)}
           </button>
@@ -83,7 +72,7 @@ export default function RegistroItem({ id, onDelete }) {
       </div>
 
       <div className="mb-4">
-        <div className="font-bold mb-2">Método de Pago</div>
+        <div className="font-bold mb-2 text-center">Método de Pago</div>
         <div className="flex gap-2 justify-center">
           {["Efectivo", "Tarjeta", "T.Cineco"].map(m => (
             <button
