@@ -4,24 +4,15 @@ import { db } from '../firebase';
 
 export default function RegistroProducto() {
   const [lotes, setLotes] = useState([]);
-  const [activo, setActivo] = useState(null);
+  const productos = ["Crispetas", "Combo Perro", "Combo Nachos"];
 
   const iniciarProduccion = () => {
     setLotes(prev => [...prev, {
       producto: '',
       cantidad: 0,
       inicio: new Date().toISOString(),
-      fin: null,
-      enviado: false
+      fin: null
     }]);
-  };
-
-  const finalizarLote = (index) => {
-    setLotes(prev => {
-      const copia = [...prev];
-      copia[index].fin = new Date().toISOString();
-      return copia;
-    });
   };
 
   const actualizarProducto = (index, producto) => {
@@ -41,6 +32,14 @@ export default function RegistroProducto() {
     });
   };
 
+  const finalizarLote = (index) => {
+    setLotes(prev => {
+      const copia = [...prev];
+      copia[index].fin = new Date().toISOString();
+      return copia;
+    });
+  };
+
   const enviarLote = async (index) => {
     const lote = lotes[index];
     if (!lote.producto || !lote.fin || lote.cantidad === 0) {
@@ -50,11 +49,7 @@ export default function RegistroProducto() {
 
     try {
       await addDoc(collection(db, "registro_producto"), lote);
-      setLotes(prev => {
-        const copia = [...prev];
-        copia[index].enviado = true;
-        return copia;
-      });
+      setLotes(prev => prev.filter((_, i) => i !== index));
     } catch (e) {
       alert("Error al enviar: " + e.message);
     }
@@ -68,7 +63,6 @@ export default function RegistroProducto() {
   };
 
   const format = (t) => t ? new Date(t).toLocaleTimeString() : "--";
-  const productos = ["Crispetas", "Combo Perro", "Combo Nachos"];
 
   return (
     <div className="text-white max-w-4xl mx-auto">
@@ -122,14 +116,12 @@ export default function RegistroProducto() {
           </div>
 
           <div className="flex justify-center gap-4">
-            {!lote.enviado && (
-              <button
-                onClick={() => enviarLote(i)}
-                className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded shadow"
-              >
-                Enviar
-              </button>
-            )}
+            <button
+              onClick={() => enviarLote(i)}
+              className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded shadow"
+            >
+              Enviar
+            </button>
             <button
               onClick={() => eliminarLote(i)}
               className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded shadow"
@@ -137,10 +129,6 @@ export default function RegistroProducto() {
               Eliminar
             </button>
           </div>
-
-          {lote.enviado && (
-            <div className="mt-3 text-green-500 font-medium">✔️ Enviado</div>
-          )}
         </div>
       ))}
     </div>
